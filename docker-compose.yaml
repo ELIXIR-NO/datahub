@@ -1,0 +1,85 @@
+services:
+
+  dh-keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: dh-keycloak
+    command: [ "start-dev", "--import-realm" ]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: superadmin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: superadmin
+      KC_PROXY_HEADERS: xforwarded
+      KC_HTTP_ENABLED: true
+      KC_HTTP_RELATIVE_PATH: /auth
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dh-kc/realm-export.json:/opt/keycloak/data/import/realm-export.json
+    networks:
+      - datahub-network
+
+  dh-app-registry:
+    build:
+      context: ./dh-app-registry
+      dockerfile: Dockerfile
+    container_name: dh-app-registry
+    environment:
+      PORT: 8001
+      PROXY_ROOT_PATH: "/dh-app-registry"
+    ports:
+      - "8001:8001"
+    networks:
+      - datahub-network
+
+  dh-proxy:
+    build:
+      context: dh-proxy
+      dockerfile: Dockerfile
+    container_name: dh-proxy
+    ports:
+      - "80:80"
+    depends_on:
+      - dh-keycloak
+    networks:
+      - datahub-network
+
+  backend-fastapi:
+    build:
+      context: ./backend-fastapi
+      dockerfile: Dockerfile
+    container_name: backend-fastapi
+    environment:
+      PORT: 8000
+      PROXY_ROOT_PATH: "/backend-fastapi"
+      KEYCLOAK_URL: "http://dh-proxy/auth/"
+      KEYCLOAK_REALM: datahub
+      KEYCLOAK_CLIENT_ID: fastapi
+      KEYCLOAK_CLIENT_SECRET: "fastapi"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - dh-keycloak
+      - dh-proxy
+    networks:
+      - datahub-network
+
+  frontend-angular:
+    build:
+      context: ./frontend-angular
+      dockerfile: Dockerfile
+    container_name: frontend-angular
+    ports:
+      - "4200:4200"
+    depends_on:
+      - dh-keycloak
+      - dh-app-registry
+      - backend-fastapi
+    networks:
+      - datahub-network
+
+
+networks:
+  datahub-network:
+    driver: bridge
+
+
+

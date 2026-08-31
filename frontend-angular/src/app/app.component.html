@@ -1,0 +1,61 @@
+<div style="padding:10px">
+  <div style="display:flex; flex-direction:row; ">
+    <button mat-button="elevated" [matMenuTriggerFor]="elementMenu">
+      <mat-icon fontSet="fa" fontIcon="fa-grip"></mat-icon>
+      Super Menu
+    </button>
+    <div style="flex: 1 1 auto;"></div>
+    @if(isAuthenticated()){
+
+    <button mat-button="elevated" (click)="logout()">
+      <mat-icon fontSet="fa" fontIcon="fa-sign-out-alt"></mat-icon> Sign out
+    </button>
+    }
+    @else{
+    <button mat-button="elevated" (click)="login()">
+      <mat-icon fontSet="fa" fontIcon="fa-right-to-bracket"></mat-icon>Sign in
+    </button>
+    }
+  </div>
+
+  <mat-menu #elementMenu="matMenu">
+    <button mat-menu-item>
+      <mat-icon fontSet="fa" fontIcon="fa-list-check"></mat-icon>
+      Data Management Plan
+    </button>
+    <button mat-menu-item>
+      <mat-icon fontSet="fa" fontIcon="fa-folder-tree"></mat-icon>
+      NeLS storage
+    </button>
+    <button mat-menu-item>
+      <mat-icon fontSet="fa" fontIcon="fa-computer"></mat-icon>
+      Analysis
+    </button>
+    <button mat-menu-item>
+      <mat-icon fontSet="fa" fontIcon="fa-box-archive"></mat-icon>
+      Archive
+    </button>
+    <button mat-menu-item>
+      <mat-icon fontSet="fa" fontIcon="fa-user-lock"></mat-icon>
+      My profile
+    </button>
+  </mat-menu>
+
+  <div style="height:50px;"></div>
+
+
+  <div style="border-radius: 10px; border: 1px solid grey; padding:10px; height:100px;">
+    {{ apiResponse() }}
+    <br />
+    <span style="font-size: small; color: #777">authenticated: {{isAuthenticated()}}</span>
+    <br />
+    @if(isAuthenticated()){
+    Name: {{ userProfile()?.firstName + " " + userProfile()?.lastName }}
+    }
+
+  </div>
+
+  <button mat-button (click)="publicCall()">Public API call</button>
+  <button mat-button (click)="protectedCall()" [disabled]="!isAuthenticated()">Protected API call</button>
+
+</div>
