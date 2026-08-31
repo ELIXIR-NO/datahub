@@ -26,7 +26,7 @@ This repository includes core applications of the ecosystem and exemplifies a ty
   - a python FastAPI application that provides front-ends and apis registered in the eco-system
   - it's currently only supports returning a fixed list
   - TODO:
-    - initialize from json file for static , intit time listing or
+    - initialize from json file for static , intermediate listing or
     - provide a restful API
     - protect endpoints with keycloak (ref fastapi example)
 - Backend FastAPI
