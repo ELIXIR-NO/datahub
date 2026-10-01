@@ -30,18 +30,6 @@ services:
     networks:
       - datahub-network
 
-  dh-proxy:
-    build:
-      context: dh-proxy
-      dockerfile: Dockerfile
-    container_name: dh-proxy
-    ports:
-      - "80:80"
-    depends_on:
-      - dh-keycloak
-    networks:
-      - datahub-network
-
   backend-fastapi:
     build:
       context: ./backend-fastapi
@@ -58,7 +46,6 @@ services:
       - "8000:8000"
     depends_on:
       - dh-keycloak
-      - dh-proxy
     networks:
       - datahub-network
 
@@ -76,6 +63,19 @@ services:
     networks:
       - datahub-network
 
+  dh-proxy:
+    build:
+      context: dh-proxy
+      dockerfile: Dockerfile
+    container_name: dh-proxy
+    ports:
+      - "80:80"
+    depends_on:
+      - dh-keycloak
+      - backend-fastapi
+      - frontend-angular
+    networks:
+      - datahub-network
 
 networks:
   datahub-network:
